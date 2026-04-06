@@ -79,6 +79,8 @@ const IT = {
   blast_shrapnel:{l:"Blast / Shrapnel (Dynamite)",i:"💥",bs:3},
   amputation:{l:"Amputation (Limb/Digit Loss)",i:"✂️",bs:5},
   animal_bite:{l:"Animal Bite / Mauling",i:"🐺",bs:2},
+  bruising:{l:"Bruising (Contusion)",i:"💜",bs:0},
+  drowning:{l:"Drowning / Near-Drowning",i:"🌊",bs:3},
 };
 
 const WEAPONS = [
@@ -118,6 +120,10 @@ const WEAPONS = [
     wound:"Animals hit HARD. A horse kick delivers roughly 2,000 pounds of force — enough to shatter bone and rupture organs. Being thrown from a horse means hitting the ground at speed, often landing on head, shoulder, or hip. Wagon crashes combine blunt force with crushing weight. Cougars and panthers slash with claws and bite the neck — deep punctures and long claw gashes. Alligators clamp down and roll — crushing bone and tearing flesh simultaneously. All animal bites carry extreme infection risk.",
     wSigns:["🐴 Horse kick: Massive single-point impact — deep bruising, shattered bone likely","💥 Thrown: Impact injuries + possible dragging if foot caught in stirrup","🛞 Wagon: Crushing weight across a wide area — ribs, pelvis, limbs","🐆 Cougar/Panther: Deep claw gashes + neck bite — they go for the throat","🐊 Alligator: Crushing jaw pressure + death roll tears flesh from bone","🦴 Fractures common — the force involved is enormous","🩸 Internal bleeding: Organs can rupture from blunt force without breaking skin","🤒 Bites: Infection almost guaranteed — animal mouths are filthy"],
     doHint:"animal-related impact"},
+  {id:"environment",cat:"Environment",guns:["Wagon Crash","Fall from Height","Fall from Cliff","Fall from Building/Roof","Drowning / Near-Drowning"],sevMod:0,
+    wound:"The frontier is as deadly as any gunfight. Wagon crashes pin victims under heavy wood and iron — ribs crack, limbs crush, heads slam against boards. Falls depend entirely on height and landing — a tumble off a porch bruises, a cliff fall shatters everything. Landing on rock versus dirt makes a massive difference. Drowning fills the lungs with water — even if pulled out alive, the lungs are waterlogged, breathing is gurgling and weak, and the brain may have been starved of air long enough to cause confusion or worse.",
+    wSigns:["🛞 Wagon crash: Crushing injuries, broken ribs, head trauma, pinned limbs","⬇️ Falls: Impact injuries matching the height — bruises to shattered bones","🪨 Landing surface matters: Dirt bruises, rock shatters, water from height is like concrete","🌊 Drowning: Blue lips, waterlogged lungs, gurgling breath, confusion","🧠 Falls onto head: Concussion minimum, skull fracture likely from height","🦴 Fractures common: Wrists (bracing), hips, ankles, spine from falls","💜 Bruising: Extensive — often the first sign before deeper damage shows","🫁 Near-drowning: Lungs full of fluid even after rescue — secondary drowning risk"],
+    doHint:"environmental hazard"},
 ];
 
 var getWeapon = function(id) { if(!id) return null; var catId = id.indexOf(":") >= 0 ? id.split(":")[0] : id; return WEAPONS.find(function(w){return w.id === catId;}); };
@@ -272,7 +278,7 @@ function getConseq(zid, sev) {
     if (sev >= 3) c.push("Effectively half-blind — can't shoot accurately, can't judge distance");
   }
   // EARS
-  if (zid.indexOf("ear") >= 0) {
+  if (zid === "l_ear" || zid === "r_ear") {
     if (sev >= 1) c.push("Ringing in that ear — hard to hear conversations on the " + s + " side");
     if (sev >= 2) c.push("Can't tell where sounds come from — directional hearing is gone");
     if (sev >= 2) c.push("Balance is off — the inner ear affects equilibrium");
@@ -576,15 +582,15 @@ function getCombined(injuries, zones) {
 }
 
 const RI = {
-  head:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","concussion","broken_nose","skull_pressure","eye_injury","ear_injury","jaw_fracture","tooth_damage","frostbite","blast_shrapnel","crush_injury","animal_bite","strangulation"],
-  neck:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","arterial_bleed","strangulation","blast_shrapnel","animal_bite","burn_1","burn_2"],
-  chest:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","rib_fracture","deflated_lung","organ_damage","blast_shrapnel","arterial_bleed","crush_injury","animal_bite"],
-  abdomen:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","organ_damage","blast_shrapnel","arterial_bleed","crush_injury","animal_bite"],
-  leftArm:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation"],
-  rightArm:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation"],
-  leftLeg:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation"],
-  rightLeg:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation"],
-  back:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","blast_shrapnel","crush_injury","fracture_hairline","fracture_linear","animal_bite"],
+  head:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","concussion","broken_nose","skull_pressure","eye_injury","ear_injury","jaw_fracture","tooth_damage","frostbite","blast_shrapnel","crush_injury","animal_bite","strangulation","bruising","drowning"],
+  neck:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","arterial_bleed","strangulation","blast_shrapnel","animal_bite","burn_1","burn_2","bruising"],
+  chest:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","rib_fracture","deflated_lung","organ_damage","blast_shrapnel","arterial_bleed","crush_injury","animal_bite","bruising","drowning"],
+  abdomen:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","organ_damage","blast_shrapnel","arterial_bleed","crush_injury","animal_bite","bruising"],
+  leftArm:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation","bruising"],
+  rightArm:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation","bruising"],
+  leftLeg:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation","bruising"],
+  rightLeg:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation","bruising"],
+  back:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","blast_shrapnel","crush_injury","fracture_hairline","fracture_linear","animal_bite","bruising"],
 };
 
 function gzi(zone) {
@@ -607,6 +613,7 @@ function gzi(zone) {
     if(t==="crush_injury"&&!["l_hand","r_hand","l_fingers","r_fingers","l_foot","r_foot","l_toes","r_toes"].includes(zone.id)) return false;
     if(t==="frostbite"&&!["l_toes","r_toes","l_foot","r_foot","l_fingers","r_fingers","l_hand","r_hand","l_ear","r_ear","nose"].includes(zone.id)) return false;
     if(t==="strangulation"&&!["l_neck","r_neck","throat"].includes(zone.id)) return false;
+    if(t==="drowning"&&!["head","chest"].includes(zone.reg)) return false;
     return true;
   });
 }
@@ -718,6 +725,16 @@ const OD = {
     doEx:{1:["/do Tooth marks punched into their {z}. Bruised around each puncture. Bleeding steady but not gushing."],2:["/do Deep bite on {z}. Skin torn where the teeth ripped free. Bleeding heavy, edges ragged. Already swelling."],3:["/do Chunk of flesh torn from {z}. Muscle visible through the gap. Tooth marks deep around it. Blood flowing freely."],4:["/do Mauled — multiple bites across {z}. Skin hanging in flaps. Muscle exposed. Blood everywhere. Shaking, going grey."],5:["/do {z} is savaged. Flesh torn away in strips. Bone visible through the ruin. Blood pumping from torn vessels. Not moving. Barely breathing."]},
     rec:["Infection is the biggest danger — clean aggressively","Bite wounds need to stay OPEN to drain — don't stitch them shut","Watch for fever, spreading redness, foul smell in the days after","If wild animal: rabies is a concern — get treatment early or it's fatal","Scarring is permanent — teeth leave distinctive marks"],
     drugs:["Whiskey to clean the wound (burns, but kills bacteria)","Laudanum for pain if the bite is deep","Carbolic acid wash to prevent infection"]},
+  bruising:{sym:{1:["Light bruise, tender to touch, slight discoloration"],2:["Visible purple-blue bruise, swollen, painful when pressed"],3:["Deep bruise, dark purple/black, significant swelling, movement painful"],4:["Massive deep tissue bruising, possible hematoma, area hot and rigid"],5:["Catastrophic bruising — tissue damage beneath, suspected internal bleeding"]},
+    signs:["💜 Color: Red→purple→blue→black = deeper/older damage","🫸 Swelling: Bigger = more blood pooled beneath skin","🌡️ Heat: Hot to touch = active bleeding underneath","📐 Size: Spreading bruise = continued bleeding below the surface","⚡ Hardness: Firm lump under bruise = hematoma (blood clot forming)"],
+    doEx:{1:["/do Light bruise forming on {z}. Tender when touched. Slight purple discoloration starting."],2:["/do Purple-blue bruise spreading across {z}. Swollen and sore. Winces when the area is pressed."],3:["/do Deep, dark bruise across {z}. Swelling is significant. Skin taut over the area. Pain with any movement."],4:["/do Massive bruising on {z} — nearly black. Area swollen hard, hot to touch. Hematoma forming underneath. Can barely tolerate being touched."],5:["/do {z} is a mottled mess of black and purple. Swelling is enormous, skin stretched tight and shiny. Tissue damage goes deep — something may be bleeding underneath. Weak, dizzy, going grey."]},
+    rec:["Cold compress if available — reduces swelling","Don't rub or massage it — makes bleeding worse","Keep the area elevated if possible","Watch for spreading — if the bruise grows fast, there's active bleeding underneath","Most bruises heal in 1-2 weeks, deep ones take longer"],
+    drugs:["Aspirin — but be careful, it thins blood and can worsen bruising","Arnica poultice — folk remedy, helps with swelling","Laudanum only if the pain is severe"]},
+  drowning:{sym:{1:["Coughing up water, gasping, shivering, confused"],2:["Waterlogged lungs, gurgling breath, blue lips, barely conscious"],3:["Not breathing, blue/grey skin, no pulse — needs immediate rescue breathing"],4:["Prolonged submersion — unresponsive, cold, no signs of life"],5:["Extended submersion — brain damage likely even if revived"]},
+    signs:["🌊 Water: Coughing/vomiting water = lungs were flooded","💙 Cyanosis: Blue lips, fingertips = oxygen-starved","🫁 Breathing: Gurgling, rattling = fluid still in lungs","🧠 Confusion: Disoriented, combative, or unresponsive = brain was starved of air","🥶 Hypothermia: Cold water + wet clothes = body temperature dropping fast","⚠️ Secondary drowning: Can seem fine then deteriorate hours later as fluid irritates lungs"],
+    doEx:{1:["/do Pulled from the water gasping and coughing. Water coming up with each heave. Shivering violently. Eyes wild, confused about where they are."],2:["/do Dragged out barely conscious. Lips blue, skin grey. Every breath gurgles — lungs full of water. Vomiting fluid. Shaking uncontrollably."],3:["/do Pulled from the water — not breathing. Skin blue-grey. No pulse. Lips purple. Water pooling from mouth and nose. Needs rescue breathing NOW."],4:["/do Under too long. Body cold and limp. No breathing, no pulse, no response. Skin mottled grey-blue. Water draining from airways. May already be gone."],5:["/do Submerged for minutes. Body is cold, grey, lifeless. Even if breathing is restored, the brain was starved too long. If they wake, they won't be the same."]},
+    rec:["Turn on side to drain water from lungs","Keep warm — strip wet clothes, wrap in dry blankets","Watch for hours after — secondary drowning can kill someone who seemed fine","If they stopped breathing: rescue breaths, chest compressions","Confusion and combativeness after rescue is normal — brain was oxygen-starved"],
+    drugs:["No drugs help — warmth and air are the treatment","Stimulants (smelling salts, slapping) to keep them conscious","Whiskey AFTER they're warm and breathing — not before"]},
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
