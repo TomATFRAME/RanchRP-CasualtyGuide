@@ -80,6 +80,9 @@ const IT = {
   amputation:{l:"Amputation (Limb/Digit Loss)",i:"✂️",bs:5},
   animal_bite:{l:"Animal Bite / Mauling",i:"🐺",bs:2},
   bruising:{l:"Bruising (Contusion)",i:"💜",bs:0},
+  black_eye:{l:"Black Eye / Swollen Eye",i:"🟣",bs:0},
+  split_lip:{l:"Split Lip / Busted Mouth",i:"👄",bs:0},
+  bloody_nose:{l:"Bloody Nose (no break)",i:"🩸",bs:0},
   drowning:{l:"Drowning / Near-Drowning",i:"🌊",bs:3},
 };
 
@@ -112,6 +115,10 @@ const WEAPONS = [
     wound:"Blade wounds create clean, narrow wound channels. Depth depends on blade length and force. A hunting knife can reach 4-6 inches deep — enough to hit organs in the abdomen or chest. The wound bleeds more once the blade is removed since it was plugging its own hole. Serrated or jagged blades (broken bottles) create ragged wounds that are harder to stitch and more prone to infection.",
     wSigns:["🗡️ Wound shape: Clean slit from smooth blade, ragged from serrated/improvised","📐 Depth: May look small on the surface but be deep — 'iceberg' wound","🩸 Bleeding increases when blade is removed — it was acting as a plug","🔪 Multiple stab wounds: Each one is a separate wound channel to assess","⚠️ Infection risk: Blades carry dirt, rust, cloth fibers deep inside","🫀 Abdominal stab + rigid belly = internal bleeding or organ leak"],
     doHint:"blade"},
+  {id:"brawl",cat:"Brawling / Fistfight",guns:["Bare Fists","Boot (Kicking)","Headbutt","Elbow Strike","Knee Strike","Thrown to Ground"],sevMod:-1,
+    wound:"Fists break skin, bruise bone, and rattle brains. Knuckles split on teeth — both fighters bleed. A good hook to the temple drops someone. Kicks to the ribs crack them. Headbutts split foreheads wide open — scalps bleed like hell even from minor cuts. Being thrown to the ground means impact injuries — wrists, elbows, the back of the head hitting dirt or wood. Most brawl injuries are minor individually, but they add up. The real danger is a knockout leading to a fall — hitting the ground is what kills in fistfights, not the punch.",
+    wSigns:["👊 Knuckle marks: Bruising in the shape of knuckles — curved, clustered","🟣 Swelling: Fast around eyes, jaw, cheekbones — the face swells quickly","🩸 Scalp/forehead cuts: Bleed heavily but often look worse than they are","💫 Concussion risk: Any hard hit to the head — especially temple, chin, back of skull","🦷 Teeth: Loose, chipped, or knocked out — check inside the mouth","💜 Body bruising: Ribs, kidneys, stomach — shows up hours later","🦴 Hand fractures: The puncher breaks their own hand on someone's skull — 'boxer's fracture'"],
+    doHint:"fist/brawl impact"},
   {id:"hammer",cat:"Blunt / Crush Weapon",guns:["Hammer","Pickaxe","Rock/Stone","Rifle Butt","Boot (Stomping)","Falling Object"],sevMod:0,
     wound:"Blunt force crushes tissue between the weapon and bone. Unlike cutting weapons, the skin may remain intact while everything underneath is destroyed — bones shatter, vessels burst, muscles pulp. The swelling is massive and rapid. Blood blisters and deep purple bruising appear fast. If skin does break, the wound edges are ragged and torn, not clean.",
     wSigns:["🔨 Skin may be intact over destroyed tissue beneath","💜 Massive bruising and swelling — appears fast","🖤 Blood blisters: Large, dark = deep tissue crushed","🦴 Bone fragments: Grinding feel when touched = shattered","📐 Wound (if skin broken): Ragged, torn, not clean-edged","⚡ Compartment syndrome: Extreme swelling cuts off blood supply to limb"],
@@ -593,7 +600,7 @@ function getCombined(injuries, zones) {
 }
 
 const RI = {
-  head:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","concussion","broken_nose","skull_pressure","eye_injury","ear_injury","jaw_fracture","tooth_damage","frostbite","blast_shrapnel","crush_injury","animal_bite","strangulation","bruising","drowning"],
+  head:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","concussion","broken_nose","skull_pressure","eye_injury","ear_injury","jaw_fracture","tooth_damage","frostbite","blast_shrapnel","crush_injury","animal_bite","strangulation","bruising","black_eye","split_lip","bloody_nose","drowning"],
   neck:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","arterial_bleed","strangulation","blast_shrapnel","animal_bite","burn_1","burn_2","bruising"],
   chest:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","rib_fracture","deflated_lung","organ_damage","blast_shrapnel","arterial_bleed","crush_injury","animal_bite","bruising","drowning"],
   abdomen:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","organ_damage","blast_shrapnel","arterial_bleed","crush_injury","animal_bite","bruising"],
@@ -624,6 +631,9 @@ function gzi(zone) {
     if(t==="crush_injury"&&!["l_hand","r_hand","l_fingers","r_fingers","l_foot","r_foot","l_toes","r_toes"].includes(zone.id)) return false;
     if(t==="frostbite"&&!["l_toes","r_toes","l_foot","r_foot","l_fingers","r_fingers","l_hand","r_hand","l_ear","r_ear","nose"].includes(zone.id)) return false;
     if(t==="strangulation"&&!["l_neck","r_neck","throat"].includes(zone.id)) return false;
+    if(t==="black_eye"&&!zone.id.includes("eye")) return false;
+    if(t==="split_lip"&&zone.id!=="mouth") return false;
+    if(t==="bloody_nose"&&zone.id!=="nose") return false;
     if(t==="drowning"&&!["head","chest"].includes(zone.reg)) return false;
     return true;
   });
@@ -741,6 +751,21 @@ const OD = {
     doEx:{1:["/do Light bruise forming on {z}. Tender when touched. Slight purple discoloration starting."],2:["/do Purple-blue bruise spreading across {z}. Swollen and sore. Winces when the area is pressed."],3:["/do Deep, dark bruise across {z}. Swelling is significant. Skin taut over the area. Pain with any movement."],4:["/do Massive bruising on {z} — nearly black. Area swollen hard, hot to touch. Hematoma forming underneath. Can barely tolerate being touched."],5:["/do {z} is a mottled mess of black and purple. Swelling is enormous, skin stretched tight and shiny. Tissue damage goes deep — something may be bleeding underneath. Weak, dizzy, going grey."]},
     rec:["Cold compress if available — reduces swelling","Don't rub or massage it — makes bleeding worse","Keep the area elevated if possible","Watch for spreading — if the bruise grows fast, there's active bleeding underneath","Most bruises heal in 1-2 weeks, deep ones take longer"],
     drugs:["Aspirin — but be careful, it thins blood and can worsen bruising","Arnica poultice — folk remedy, helps with swelling","Laudanum only if the pain is severe"]},
+  black_eye:{sym:{1:["Eye area tender, slight puffiness, reddening"],2:["Swollen shut or nearly shut, deep purple-blue discoloration"],3:["Massively swollen, can't open the eye, dark purple spreading to cheekbone"]},
+    signs:["🟣 Color: Red→purple→blue→yellow-green as it heals over days","👁️ Vision: Can they see out of it? Swollen shut ≠ eye damage","🫸 Swelling: How far has it spread — just the lid or the whole socket?","💧 Tearing: Watering from the affected eye is normal","⚠️ Check the eye underneath: If vision is blurry or double, the eyeball may be damaged too"],
+    doEx:{1:["/do Eye at {z} starting to puff up. Tender to touch. Reddening around the socket. Can still see fine."],2:["/do {z} swollen nearly shut. Deep purple bruise spreading across the socket and onto the cheekbone. Squinting through a slit."],3:["/do {z} swollen completely shut. Dark purple, almost black bruising from eyebrow to cheekbone. Can't open it at all. Other eye watering in sympathy."],4:["/do {z} is a swollen mess — eyebrow to cheekbone is one solid dark purple mass. Skin stretched tight and shiny. Can't see a thing from that side."],5:["/do Both eyes swollen shut from the beating. Face is a purple, swollen mess. Can barely see through either. Skin split over the cheekbone from the swelling alone."]},
+    rec:["Cold compress reduces swelling — raw steak on a black eye is the frontier way","Takes 1-2 weeks to fully heal through the color stages","If vision is affected after swelling goes down, the eye itself may be damaged","Don't rub it — makes it worse"],
+    drugs:["No drugs needed for a black eye — just time and cold"]},
+  split_lip:{sym:{1:["Lip split, bleeding, swollen"],2:["Deep split, heavy bleeding, teeth may be loosened"],3:["Lip torn badly, teeth damaged, heavy swelling"]},
+    signs:["👄 Split: Clean split or ragged tear?","🩸 Bleeding: Lips bleed heavily — lots of blood supply","🦷 Teeth: Check behind the lip — teeth loosened or chipped?","🫸 Swelling: Lips swell fast and big — looks worse than it is","🗣️ Speech: Slurred or lisping from the swelling"],
+    doEx:{1:["/do Lip split open. Blood running down the chin. Swelling already puffing the lip out. Talking with a lisp."],2:["/do Lip torn deep — blood flowing freely, dripping off the chin. Lip swollen to twice normal size. Spitting blood. Teeth intact but sore."],3:["/do Lip ripped open badly. Blood pouring. Teeth visible through the tear. Lip swollen huge. Can barely talk — every word pulls at the wound."],4:["/do Mouth is a mess. Lip split in multiple places. Blood everywhere — teeth, chin, shirt. Spitting out blood and fragments of tooth. Jaw aching."],5:["/do Lower face is destroyed. Lips torn, teeth broken or missing. Blood flowing constantly. Can't close the mouth properly. Jaw may be cracked underneath."]},
+    rec:["Pressure to stop the bleeding — bite down on clean cloth","Don't eat hot food or drink — reopens the split","Swelling goes down in a few days, split heals in a week","Scarring likely if the split is deep"],
+    drugs:["Whiskey to clean it — stings like hell","No drugs needed unless jaw is damaged too"]},
+  bloody_nose:{sym:{1:["Nose bleeding, not broken — just took a hit"],2:["Heavy nosebleed, blood flowing freely, may be swallowing blood"]},
+    signs:["🩸 Flow: Steady drip or pouring?","👃 Shape: Nose still straight = not broken, just bleeding","🤢 Swallowing blood: Nausea and vomiting from swallowed blood is common","⏱️ Duration: Most stop in 10-15 minutes with pressure"],
+    doEx:{1:["/do Nose streaming blood. Not crooked — not broken, just took a good hit. Pinching the bridge, head tilted forward. Blood dripping steady."],2:["/do Blood pouring from both nostrils. Swallowing some — gagging on it. Nose swollen but straight. Took a hard hit."],3:["/do Nose gushing. Blood down the chin, down the shirt. Coughing up swallowed blood. Nose hugely swollen but still in line — not broken, just battered."],4:["/do Nose won't stop bleeding. Soaked through cloth after cloth. Dizzy from blood loss and swallowing blood. Starting to look pale."],5:["/do Nose bleeding won't stop despite pressure. Blood loss is becoming a concern. Vomiting swallowed blood. Needs packing — something is torn deep inside the nostril."]},
+    rec:["Lean FORWARD not back — swallowing blood causes vomiting","Pinch the soft part of the nose, hold 10 minutes","Don't blow the nose after — dislodges the clot","Stuffing cloth or cotton in the nostril helps"],
+    drugs:["No drugs needed — just pressure and time"]},
   drowning:{sym:{1:["Coughing up water, gasping, shivering, confused"],2:["Waterlogged lungs, gurgling breath, blue lips, barely conscious"],3:["Not breathing, blue/grey skin, no pulse — needs immediate rescue breathing"],4:["Prolonged submersion — unresponsive, cold, no signs of life"],5:["Extended submersion — brain damage likely even if revived"]},
     signs:["🌊 Water: Coughing/vomiting water = lungs were flooded","💙 Cyanosis: Blue lips, fingertips = oxygen-starved","🫁 Breathing: Gurgling, rattling = fluid still in lungs","🧠 Confusion: Disoriented, combative, or unresponsive = brain was starved of air","🥶 Hypothermia: Cold water + wet clothes = body temperature dropping fast","⚠️ Secondary drowning: Can seem fine then deteriorate hours later as fluid irritates lungs"],
     doEx:{1:["/do Pulled from the water gasping and coughing. Water coming up with each heave. Shivering violently. Eyes wild, confused about where they are."],2:["/do Dragged out barely conscious. Lips blue, skin grey. Every breath gurgles — lungs full of water. Vomiting fluid. Shaking uncontrollably."],3:["/do Pulled from the water — not breathing. Skin blue-grey. No pulse. Lips purple. Water pooling from mouth and nose. Needs rescue breathing NOW."],4:["/do Under too long. Body cold and limp. No breathing, no pulse, no response. Skin mottled grey-blue. Water draining from airways. May already be gone."],5:["/do Submerged for minutes. Body is cold, grey, lifeless. Even if breathing is restored, the brain was starved too long. If they wake, they won't be the same."]},
@@ -1006,9 +1031,9 @@ function QuickRefTab(){
 const CAUSES = [
   {id:"gunfight",label:"🔫 Gunfight",desc:"Shot by a firearm",types:["gsw_lodged","gsw_tt","gsw_graze","arterial_bleed","blast_shrapnel"]},
   {id:"melee",label:"🗡️ Melee & Blades",desc:"Stabbed, slashed, or cut",types:["stab_wound","open_wound","arterial_bleed","amputation"]},
-  {id:"brawl",label:"👊 Brawl",desc:"Punched, kicked, beaten",types:["concussion","broken_nose","open_wound","crush_injury","dislocation","jaw_fracture","tooth_damage","ear_injury","eye_injury","rib_fracture","strangulation"]},
-  {id:"animal",label:"🐴 Animal & Horse",desc:"Kicked, thrown, trampled, bitten",types:["crush_injury","open_wound","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","concussion","rib_fracture","snake_bite","organ_damage","amputation","animal_bite"]},
-  {id:"environment",label:"🌿 Environment",desc:"Burns, falls, cold, blasts",types:["burn_1","burn_2","burn_3","frostbite","blast_shrapnel","fracture_hairline","fracture_linear","fracture_comminuted","crush_injury","dislocation","open_wound","concussion"]},
+  {id:"brawl",label:"👊 Brawl",desc:"Punched, kicked, beaten",types:["bruising","black_eye","split_lip","bloody_nose","broken_nose","concussion","open_wound","crush_injury","dislocation","jaw_fracture","tooth_damage","ear_injury","eye_injury","rib_fracture","strangulation"]},
+  {id:"animal",label:"🐴 Animal & Horse",desc:"Kicked, thrown, trampled, bitten",types:["bruising","concussion","broken_nose","crush_injury","open_wound","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","rib_fracture","snake_bite","organ_damage","amputation","animal_bite"]},
+  {id:"environment",label:"🌿 Environment",desc:"Burns, falls, crashes, drowning",types:["bruising","concussion","broken_nose","drowning","burn_1","burn_2","burn_3","frostbite","blast_shrapnel","fracture_hairline","fracture_linear","fracture_comminuted","crush_injury","dislocation","open_wound","organ_damage"]},
   {id:"all",label:"📋 All Types",desc:"Browse everything",types:null},
 ];
 
