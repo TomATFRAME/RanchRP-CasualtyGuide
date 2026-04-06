@@ -1,0 +1,3 @@
+[submodule "casualty-guide"]
+	path = casualty-guide
+	url = https://github.com/dubsarge/casualty-guide.git
