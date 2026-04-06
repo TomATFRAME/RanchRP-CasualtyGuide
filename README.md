@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Casualty's Field Guide — Ranch Roleplay
 
-## Getting Started
+An interactive medical RP reference for the State of Monroe.
 
-First, run the development server:
+## Deploy to Vercel (easiest)
+
+1. Push this entire folder to a **new GitHub repo**
+2. Go to [vercel.com](https://vercel.com) and sign in with GitHub
+3. Click **"Add New Project"** → select your repo → click **Deploy**
+4. Done. Vercel auto-detects Vite and builds it.
+
+### Custom domain (optional)
+In your Vercel project → Settings → Domains → add `guide.ranchroleplay.com` (or whatever). Then add a CNAME record at your domain registrar pointing to `cname.vercel-dns.com`.
+
+## Run locally (optional)
+
+Requires [Node.js](https://nodejs.org) installed.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Opens at http://localhost:5173
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Update the guide
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Edit `src/App.jsx` — that's the entire app in one file. Push to GitHub and Vercel auto-deploys.
