@@ -338,6 +338,14 @@ var INT_DMG = [
       4:["Major artery severed — blood spurting with each heartbeat","Life-threatening in minutes without a tourniquet","Skin going white, pulse racing, consciousness fading"],
       5:["Major artery completely severed — catastrophic hemorrhage","Death within minutes without immediate clamping and repair","The body has lost too much — even with repair, survival is uncertain"]
     }},
+  {id:"bone",l:"Bone Involvement",sevMod:1,
+    effects:{
+      1:["Bullet or blade nicked the bone — sharp localized pain on top of the wound","Bone bruised but intact — deep ache that throbs with the pulse","Movement is more painful than the wound alone would explain"],
+      2:["Bone chipped — small fragments may be loose in the wound","Grinding sensation when the area moves — fragment irritation","Increased infection risk — bone fragments carry bacteria deeper","Splinting needed even though it's not a full break"],
+      3:["Bone cracked along the bullet/blade path — structural integrity compromised","The limb or area can't bear weight or strain — it'll give way","Bone fragments have become secondary projectiles inside the tissue","Surgical removal of fragments likely needed"],
+      4:["Bone shattered by the projectile — comminuted fracture along the wound channel","Fragments driven into surrounding muscle and vessels — bleeding from inside","The bone is in pieces — no structural support left","Limb is non-functional, amputation may be the only option"],
+      5:["Bone obliterated — pulverized by the impact","Fragments scattered through the tissue like secondary shrapnel","No reconstruction possible — the bone is gone","Amputation is almost certain if it's a limb"]
+    }},
   {id:"organ",l:"Organ Involvement",sevMod:2,
     effects:{
       1:["Organ bruised but intact — deep aching pain","Tenderness when the area is pressed","Internal swelling causing discomfort"],
@@ -454,7 +462,7 @@ var getIntDmg = function(id) { return INT_DMG.find(function(d){return d.id===id;
 var canHaveIntDmg = function(type) {
   return ["gsw_lodged","gsw_tt","gsw_graze","stab_wound","blast_shrapnel","crush_injury",
     "open_wound","fracture_linear","fracture_comminuted","arterial_bleed","organ_damage",
-    "deflated_lung","snake_bite","amputation"].indexOf(type) >= 0;
+    "deflated_lung","snake_bite","amputation","animal_bite"].indexOf(type) >= 0;
 };
 
 // Zone-aware internal damage filtering — no organ damage for chin, etc.
@@ -476,12 +484,15 @@ var getAvailIntDmg = function(zoneId) {
   var hasMuscle = ["l_eye","r_eye","l_ear","r_ear"].indexOf(id)<0;
   // Nerve damage available everywhere but more notable in certain areas
   var hasNerve = true;
+  // Bone involvement available for zones with bone anatomy
+  var hasBone = z.anat.some(function(a){return /bone|skull|humerus|radius|ulna|femur|tibia|fibula|patella|metacarpal|metatarsal|clavicle|phalanges|mandible|parietal|frontal|temporal|nasal|rib|sternum|spine|vertebra|pelvi|scapula/i.test(a);});
   return INT_DMG.filter(function(d){
     if(d.id==="organ" && !hasOrgan) return false;
     if(d.id==="vessel_sever" && !hasVesselSever) return false;
     if(d.id==="vessel_nick" && !hasVesselNick) return false;
     if(d.id==="muscle" && !hasMuscle) return false;
     if(d.id==="nerve" && !hasNerve) return false;
+    if(d.id==="bone" && !hasBone) return false;
     return true;
   });
 };
