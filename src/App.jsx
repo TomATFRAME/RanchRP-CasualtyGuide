@@ -140,8 +140,41 @@ const isStabOrArrow = (type) => type === "stab_wound";
 const isCrush = (type) => type === "crush_injury";
 const isAnimalBite = (type) => type === "animal_bite";
 // Injury types that ARE the cause (no separate mechanism needed)
-const SELF_CAUSED = ["snake_bite","frostbite","drowning","strangulation","burn_1","burn_2","burn_3","skull_pressure","arterial_bleed"];
+const SELF_CAUSED = ["snake_bite","frostbite","drowning","strangulation","burn_1","burn_2","burn_3","skull_pressure","arterial_bleed","blast_shrapnel"];
 const needsWeapon = (type) => type && SELF_CAUSED.indexOf(type) < 0;
+
+// Which weapon categories make sense for each injury type
+const VALID_WEAPONS = {
+  gsw_lodged: ["handgun","sawnoff","repeater","shotgun","rifle"],
+  gsw_tt: ["handgun","sawnoff","repeater","shotgun","rifle"],
+  gsw_graze: ["handgun","sawnoff","repeater","shotgun","rifle"],
+  stab_wound: ["knife","bow"],
+  open_wound: ["knife","bow","hammer","brawl","horse","environment","handgun","sawnoff","repeater","shotgun","rifle"],
+  concussion: ["hammer","brawl","horse","environment"],
+  broken_nose: ["hammer","brawl","horse","environment"],
+  bloody_nose: ["hammer","brawl","horse","environment"],
+  black_eye: ["hammer","brawl","horse","environment"],
+  split_lip: ["hammer","brawl","horse"],
+  bruising: ["hammer","brawl","horse","environment"],
+  crush_injury: ["hammer","horse","environment"],
+  fracture_hairline: ["hammer","brawl","horse","environment","handgun","repeater","shotgun","rifle"],
+  fracture_linear: ["hammer","horse","environment","shotgun","rifle","handgun","repeater"],
+  fracture_comminuted: ["hammer","horse","environment","shotgun","rifle"],
+  dislocation: ["brawl","horse","environment","hammer"],
+  jaw_fracture: ["hammer","brawl","horse"],
+  tooth_damage: ["hammer","brawl","horse"],
+  ear_injury: ["hammer","brawl","horse","environment"],
+  eye_injury: ["hammer","brawl","horse","environment","knife","bow"],
+  rib_fracture: ["hammer","brawl","horse","environment","handgun","repeater","shotgun","rifle"],
+  organ_damage: ["handgun","sawnoff","repeater","shotgun","rifle","knife","bow","hammer","horse","environment"],
+  deflated_lung: ["handgun","sawnoff","repeater","shotgun","rifle","knife","bow","hammer","horse","environment"],
+  animal_bite: ["horse"],
+  amputation: ["sawnoff","shotgun","rifle","handgun","hammer","horse","environment","knife"],
+};
+const validWeapons = (type) => {
+  if (!type || !VALID_WEAPONS[type]) return WEAPONS;
+  return WEAPONS.filter(w => VALID_WEAPONS[type].indexOf(w.id) >= 0);
+};
 
 function getConseq(zid, sev) {
   var c = [];
@@ -1137,8 +1170,8 @@ export default function App(){
                 {zone&&<select value={inj.type||""} onChange={e=>{setInjs(p=>p.map((x,j)=>j===i?{...x,type:e.target.value,weapon:"",intDmg:"",intSev:0}:x));}} onClick={e=>e.stopPropagation()} style={sel}><option value="">— Pick the injury —</option>{causeTypes.map(k=><option key={k} value={k}>{IT[k]&&IT[k].i} {IT[k]&&IT[k].l}</option>)}</select>}
                 {inj.type&&needsWeapon(inj.type)&&(
                   <select value={inj.weapon||""} onChange={e=>{setInjs(p=>p.map((x,j)=>j===i?{...x,weapon:e.target.value}:x));}} onClick={e=>e.stopPropagation()} style={{...sel,marginTop:4,borderColor:inj.weapon?"#6b8f3c":"#c4a882"}}>
-                    <option value="">— What weapon? (optional) —</option>
-                    {(isStabOrArrow(inj.type)?WEAPONS.filter(w=>w.id==="bow"||w.id==="knife"):isCrush(inj.type)?WEAPONS.filter(w=>w.id==="hammer"||w.id==="horse"):isAnimalBite(inj.type)?WEAPONS.filter(w=>w.id==="horse"):WEAPONS.filter(w=>w.id!=="knife"&&w.id!=="hammer"&&w.id!=="horse")).map(w=>(
+                    <option value="">— What caused it? (optional) —</option>
+                    {validWeapons(inj.type).map(w=>(
                       <optgroup key={w.id} label={w.cat}>{w.guns.map(g=><option key={g} value={w.id+":"+g}>{g}</option>)}</optgroup>
                     ))}
                   </select>
