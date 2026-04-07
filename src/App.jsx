@@ -469,7 +469,7 @@ var getIntDmg = function(id) { return INT_DMG.find(function(d){return d.id===id;
 var canHaveIntDmg = function(type) {
   return ["gsw_lodged","gsw_tt","gsw_graze","stab_wound","blast_shrapnel","crush_injury",
     "open_wound","fracture_linear","fracture_comminuted","arterial_bleed","organ_damage",
-    "deflated_lung","snake_bite","amputation","animal_bite"].indexOf(type) >= 0;
+    "deflated_lung","snake_bite","animal_bite"].indexOf(type) >= 0;
 };
 
 // Zone-aware internal damage filtering — no organ damage for chin, etc.
