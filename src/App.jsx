@@ -500,6 +500,19 @@ var getLethalityWarning = function(zid, type, weaponId, sv) {
 
 var getIntDmg = function(id) { return INT_DMG.find(function(d){return d.id===id;}); };
 
+// Face zones where a visible permanent scar would realistically result
+var FACE_ZONES = ["crown","forehead","l_temple","r_temple","l_eye","r_eye","nose","mouth","chin"];
+// Injury types that commonly leave permanent facial scarring at sufficient severity
+var SCARRING_TYPES = ["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","blast_shrapnel","animal_bite","broken_nose","jaw_fracture","crush_injury","split_lip"];
+var getScarRec = function(zid, type, sv) {
+  if (FACE_ZONES.indexOf(zid) < 0) return null;
+  if (SCARRING_TYPES.indexOf(type) < 0) return null;
+  // Burns scar even at lower severity. Everything else needs sev 3+
+  var threshold = (type === "burn_2" || type === "burn_3") ? 2 : 3;
+  if (sv < threshold) return null;
+  return "A wound like this on the face would leave a permanent scar. Consider adding a matching facial scar to your character in the Ranch appearance editor — Ranch has a variety of face scars (slashes, cuts, burns, bite marks) available in the character creator to represent the injury permanently.";
+};
+
 // Injury types that can have internal damage
 var canHaveIntDmg = function(type) {
   return ["gsw_lodged","gsw_tt","gsw_graze","stab_wound","blast_shrapnel","crush_injury",
@@ -1221,6 +1234,12 @@ export default function App(){
             {(function(){var lw=getLethalityWarning(inj.zid,inj.type,inj.weapon,sv);return lw?React.createElement("div",{style:{background:lw.level==="fatal"?"rgba(74,0,0,.12)":"rgba(178,34,34,.08)",borderRadius:7,padding:"8px 10px",marginBottom:8,border:"2px solid "+(lw.level==="fatal"?"#4a0000":"#b22222")}},
               React.createElement("p",{style:{fontSize:12,fontWeight:"bold",color:lw.level==="fatal"?"#4a0000":"#b22222",margin:"0 0 3px",fontFamily:"Georgia,serif"}},"⚠️ "+(lw.level==="fatal"?"ALMOST CERTAINLY FATAL":"EXTREMELY DANGEROUS")),
               React.createElement(P,{style:{fontSize:10.5,fontStyle:"italic",color:T.textMuted}},"Your story, your call. Work with your doc if you want to survive this.")
+            ):null;})()}
+
+            {/* Permanent scar recommendation for facial injuries */}
+            {(function(){var sr=getScarRec(inj.zid,inj.type,sv);return sr?React.createElement("div",{style:{background:"rgba(139,85,52,.08)",borderRadius:7,padding:"8px 10px",marginBottom:8,border:"1px solid rgba(139,85,52,.25)"}},
+              React.createElement("p",{style:{fontSize:11,fontWeight:"bold",color:"#8b5534",margin:"0 0 3px",fontFamily:"Georgia,serif"}},"✨ Permanent Scar Recommended"),
+              React.createElement(P,{style:{fontSize:11,color:T.textSecondary}},sr)
             ):null;})()}
 
             {/* What it looks like — short scene description */}
