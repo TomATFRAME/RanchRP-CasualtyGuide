@@ -510,80 +510,7 @@ var getLethalityWarning = function(zid, type, weaponId, sv) {
 
 var getIntDmg = function(id) { return INT_DMG.find(function(d){return d.id===id;}); };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// DOCTOR TREATMENT GUIDANCE — zone + injury type specific
-// ═══════════════════════════════════════════════════════════════════════════════
-var getDocTreatment = function(zid, type, sv) {
-  var z = Z.find(function(zn){return zn.id===zid;});
-  if (!z) return null;
-  var steps = [];
-  var organs = z.anat.filter(function(a){return /heart|lung|liver|spleen|kidney|stomach|intestine|bladder|gallbladder|pancreas|appendix/i.test(a);});
-  var arteries = z.anat.filter(function(a){return /artery|arterial|aorta|carotid|femoral/i.test(a);});
-  var bones = z.anat.filter(function(a){return /bone|skull|rib|spine|vertebra|mandible|patella|femur|tibia|fibula|humerus|radius|ulna|clavicle|sternum|scapula|pelvi/i.test(a);});
 
-  // General triage
-  if (sv >= 3) steps.push("🩺 TRIAGE: Assess airway, breathing, bleeding. Stop the worst bleed first.");
-  if (sv >= 4) steps.push("⚠️ CRITICAL: Patient is in or approaching shock. Keep them warm, legs elevated if no spinal injury.");
-
-  // Bleeding control
-  if (["gsw_lodged","gsw_tt","gsw_graze","stab_wound","open_wound","blast_shrapnel","arterial_bleed","animal_bite","amputation"].indexOf(type)>=0) {
-    if (arteries.length > 0) steps.push("🩸 BLEEDING: " + arteries.join(", ") + " at risk. Apply direct pressure. Tourniquet above wound for limb arteries. Carotid/aorta = pack and pray.");
-    else steps.push("🩸 BLEEDING: Direct pressure, clean cloth packing. Elevate if possible.");
-  }
-
-  // Organ-specific treatment
-  if (type === "organ_damage" || (sv >= 3 && organs.length > 0 && ["gsw_lodged","gsw_tt","stab_wound","blast_shrapnel","crush_injury"].indexOf(type)>=0)) {
-    organs.forEach(function(o) {
-      var ol = o.toLowerCase();
-      if (/liver/i.test(ol)) steps.push("🫀 LIVER: Largest organ, bleeds heavily. Pack the wound tightly. Patient on their RIGHT side. No food or drink. Surgery to stitch or cauterize the tear. Monitor for hours — liver bleeds can restart.");
-      if (/spleen/i.test(ol)) steps.push("🫀 SPLEEN: Blood-rich, ruptures easily. Pack tightly. If it won't stop bleeding, the spleen may need removal — patient can survive without it. Left-side pain radiating to shoulder = classic sign.");
-      if (/kidney/i.test(ol)) steps.push("🫀 KIDNEY: Deep, flanked by muscle. Blood in urine = kidney hit. Bed rest, fluids. If one kidney is destroyed, the other compensates. Watch for infection.");
-      if (/stomach/i.test(ol)) steps.push("🫀 STOMACH: Acid leaking into the abdomen causes peritonitis — infection spreads fast. No food or water by mouth. Wound needs surgical closure. Carbolic acid wash of the cavity.");
-      if (/intestine/i.test(ol)) steps.push("🫀 INTESTINE: Contents leaking = peritonitis (deadly). Abdomen becomes rigid and hot. Surgery to repair or resect the damaged section. Carbolic wash. No food until healed — broth only.");
-      if (/bladder/i.test(ol)) steps.push("🫀 BLADDER: Urine leaking into abdomen = infection. Can't urinate or blood in urine. Needs surgical repair and drainage.");
-      if (/lung/i.test(ol)) steps.push("🫁 LUNG: If punctured, air escapes into chest cavity — lung collapses. Seal the wound airtight (petroleum jelly + cloth). May need a chest tube (hollow reed/tube between ribs) to drain air/blood.");
-      if (/heart/i.test(ol)) steps.push("🫀 HEART: Almost always fatal. If still alive, do NOT remove the object plugging the wound. Immediate surgery — and even then, survival is near-miraculous.");
-      if (/pancreas/i.test(ol)) steps.push("🫀 PANCREAS: Deep, hard to reach. Digestive enzymes leak and literally digest surrounding tissue. Surgery if accessible. Extremely dangerous.");
-      if (/gallbladder/i.test(ol)) steps.push("🫀 GALLBLADDER: Bile leaking causes chemical peritonitis. Can be removed — patient survives without it. Avoid fatty foods after.");
-      if (/appendix/i.test(ol)) steps.push("🫀 APPENDIX: If ruptured, infection spreads fast. Remove it — not needed. Classic sign: pain starts at navel, moves to lower right.");
-    });
-  }
-
-  // Collapsed lung specific
-  if (type === "deflated_lung") {
-    steps.push("🫁 COLLAPSED LUNG: Seal any chest wound airtight — petroleum jelly and cloth, taped on three sides (valve effect). Patient sits upright to breathe easier. May need a hollow tube inserted between ribs to release trapped air.");
-  }
-
-  // Fracture treatment
-  if (/fracture/.test(type) || type === "broken_nose") {
-    if (type === "fracture_comminuted") steps.push("🦴 SHATTERED BONE: Splint and immobilize. DO NOT attempt to set — pieces are too small. Likely needs amputation if circulation is lost. Keep the limb elevated.");
-    else if (type === "fracture_linear") steps.push("🦴 SIMPLE BREAK: Set the bone (pull to align), splint firmly. Patient bites down on leather during setting. Check circulation below the splint — fingers/toes should stay pink and warm.");
-    else if (type === "fracture_hairline") steps.push("🦴 HAIRLINE FRACTURE: Splint or bind. No setting needed. Rest the area completely. Weight-bearing = it gets worse.");
-    else if (type === "rib_fracture") steps.push("🦴 RIB FRACTURE: Bind the chest firmly but not too tight — they need to breathe. No setting possible. Watch for punctured lung (coughing blood, difficulty breathing).");
-    else if (type === "broken_nose") steps.push("🦴 BROKEN NOSE: Reset by pushing back into alignment — quick, painful. Pack nostrils with clean cloth. Cocaine paste on the skin before resetting numbs the area.");
-  }
-
-  // Concussion
-  if (type === "concussion") steps.push("🧠 CONCUSSION: Keep awake for first few hours. Check pupils — uneven = serious. Ask simple questions (name, date). Rest in a dark quiet room. No alcohol.");
-
-  // Burns
-  if (/burn/.test(type)) {
-    steps.push("🔥 BURN CARE: Cool with clean water (not ice). Do NOT pop blisters — they protect the tissue underneath. Cover loosely with clean cloth. Watch for infection (cloudy fluid, smell, fever).");
-    if (type === "burn_3") steps.push("🔥 3RD DEGREE: Dead tissue must be removed (debridement). Maggots can clean it (medical maggots eat only dead tissue). Skin grafting if available. This is weeks of care.");
-  }
-
-  // Snake bite
-  if (type === "snake_bite") steps.push("🐍 SNAKE BITE: Keep the bitten limb BELOW the heart. Do NOT cut or suck the wound. Splint to limit movement. Identify the snake if possible. Get antivenin if available.");
-
-  // Amputation
-  if (type === "amputation") steps.push("✂️ AMPUTATION: Tourniquet FIRST. Ether to knock them out. Cut cleanly above the damage. Cauterize or tie off vessels. Leave a flap of skin to fold over the stump. Carbolic acid wash.");
-
-  // General wound care
-  if (steps.length > 0 && sv >= 2) steps.push("🧹 WOUND CARE: Carbolic acid or whiskey to clean. Remove debris, cloth fragments, bullet fragments. Stitch if edges are clean — leave ragged wounds open to drain.");
-  if (steps.length > 0) steps.push("💊 PAIN: Morphine for severe pain (addictive). Laudanum for moderate. Aspirin for mild. Cocaine paste for surface numbing before procedures.");
-
-  return steps.length > 0 ? steps : null;
-};
 
 // Face zones where a visible permanent scar would realistically result
 var FACE_ZONES = ["crown","forehead","l_temple","r_temple","l_eye","r_eye","nose","mouth","chin"];
@@ -1353,13 +1280,6 @@ export default function App(){
 
             {/* Practical consequences — keep, it's immersive */}
             <ConseqOut zid={inj.zid} sev={sv}/>
-
-            {/* Doctor treatment guide — zone + injury specific */}
-            {(function(){var dt=getDocTreatment(inj.zid,inj.type,sv);return dt?React.createElement("div",{style:{background:"rgba(34,100,34,.05)",borderRadius:6,padding:"8px 9px",marginBottom:6,border:"1px solid rgba(34,100,34,.2)"}},
-              React.createElement(P,{style:{fontSize:11,fontWeight:"bold",color:"#228B22",marginBottom:4}},"🩺 Doctor's Treatment Guide"),
-              dt.map(function(s,j){return React.createElement(P,{key:j,style:{fontSize:11,marginBottom:3}},s);}),
-              React.createElement(P,{style:{fontSize:9.5,fontStyle:"italic",color:T.textMuted,marginTop:4}},"These are period-appropriate treatment steps for the doc to RP. Adapt to your scene.")
-            ):null;})()}
 
             {/* Recovery — just the timeline, brief */}
             <div style={{background:T.sectionBg,borderRadius:6,padding:"6px 9px",marginBottom:4,border:"1px solid "+T.borderLight}}>
