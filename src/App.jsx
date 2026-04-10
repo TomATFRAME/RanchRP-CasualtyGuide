@@ -6,16 +6,17 @@ const ThemeCtx = createContext(null);
 // ═══════════════════════════════════════════════════════════════════════════════
 const Z = [
   {id:"crown",label:"Top of Head",x:150,y:7,r:16,anat:["Parietal bone (top of skull)","Brain (parietal lobe)"],sev:2,desc:"Thick bone but blunt force causes concussions. Scalp bleeds heavily — very vascular.",reg:"head",g:"Head"},
-  {id:"forehead",label:"Forehead",x:148,y:22,r:13,anat:["Frontal bone (forehead plate) (thick)","Brain (frontal lobe)"],sev:2,desc:"Relatively thick bone offering decent protection, but hard hits fracture it or concuss the brain beneath.",reg:"head",g:"Head"},
-  {id:"l_temple",label:"Patient's Left Temple",x:170,y:27,r:10,anat:["Temporal bone (side of skull) (thin)","Temporal artery","Brain (temporal lobe)"],sev:3,desc:"One of the thinnest skull areas. The temporal artery is just beneath. Trauma here is extremely dangerous.",reg:"head",g:"Head"},
-  {id:"r_temple",label:"Patient's Right Temple",x:126,y:27,r:10,anat:["Temporal bone (side of skull) (thin)","Temporal artery","Brain (temporal lobe)"],sev:3,desc:"Thinnest skull area. Temporal artery beneath. Extremely dangerous to trauma.",reg:"head",g:"Head"},
-  {id:"l_eye",label:"Patient's Left Eye",x:159,y:35,r:8,anat:["Eyeball","Optic nerve (carries vision to brain)","Orbital bone (eye socket ring)"],sev:2,desc:"The eye socket provides some bony protection, but the eye itself is extremely fragile. Damage can cause partial or total blindness.",reg:"head",g:"Head"},
-  {id:"r_eye",label:"Patient's Right Eye",x:135,y:35,r:8,anat:["Eyeball","Optic nerve (carries vision to brain)","Orbital bone (eye socket ring)"],sev:2,desc:"The orbital bone shields the eye but direct trauma risks blindness.",reg:"head",g:"Head"},
+  {id:"forehead",label:"Forehead",x:148,y:22,r:13,anat:["Frontal bone (forehead plate) (thick)","Brain (frontal lobe)"],sev:2,desc:"Relatively thick bone offering decent protection, but hard hits fracture it or concuss the brain beneath.",reg:"head",g:"Head",fo:true},
+  {id:"l_temple",label:"Patient's Left Temple",x:170,y:27,r:10,anat:["Temporal bone (side of skull) (thin)","Temporal artery","Brain (temporal lobe)"],sev:3,desc:"One of the thinnest skull areas. The temporal artery is just beneath. Trauma here is extremely dangerous.",reg:"head",g:"Head",fo:true},
+  {id:"r_temple",label:"Patient's Right Temple",x:126,y:27,r:10,anat:["Temporal bone (side of skull) (thin)","Temporal artery","Brain (temporal lobe)"],sev:3,desc:"Thinnest skull area. Temporal artery beneath. Extremely dangerous to trauma.",reg:"head",g:"Head",fo:true},
+  {id:"l_eye",label:"Patient's Left Eye",x:159,y:35,r:8,anat:["Eyeball","Optic nerve (carries vision to brain)","Orbital bone (eye socket ring)"],sev:2,desc:"The eye socket provides some bony protection, but the eye itself is extremely fragile. Damage can cause partial or total blindness.",reg:"head",g:"Head",fo:true},
+  {id:"r_eye",label:"Patient's Right Eye",x:135,y:35,r:8,anat:["Eyeball","Optic nerve (carries vision to brain)","Orbital bone (eye socket ring)"],sev:2,desc:"The orbital bone shields the eye but direct trauma risks blindness.",reg:"head",g:"Head",fo:true},
   {id:"l_ear",label:"Patient's Left Ear",x:175,y:35,r:8,anat:["Ear canal","Eardrum","Inner ear (balance)"],sev:1,desc:"Outer ear tears easily and bleeds heavily. Eardrum damage from blasts or blows causes deafness or vertigo.",reg:"head",g:"Head"},
   {id:"r_ear",label:"Patient's Right Ear",x:119,y:35,r:8,anat:["Ear canal","Eardrum","Inner ear (balance)"],sev:1,desc:"Outer ear bleeds heavily when torn. Eardrum damage causes hearing loss and balance issues.",reg:"head",g:"Head"},
-  {id:"nose",label:"Nose",x:147,y:45,r:8,anat:["Nasal bone (thin)","Nose cartilage (flexible part)","Sinuses","Blood vessels (rich supply)"],sev:1,desc:"The nasal bone breaks easily — one of the most common facial fractures. Bleeds heavily due to rich blood supply.",reg:"head",g:"Head"},
-  {id:"mouth",label:"Mouth / Jaw",x:146,y:55,r:8,anat:["Jawbone","Teeth","Tongue","Oral blood vessels"],sev:1,desc:"The jaw can fracture or dislocate. Teeth can be knocked out or shattered.",reg:"head",g:"Head"},
-  {id:"chin",label:"Chin",x:146,y:64,r:7,anat:["Mandible (jawbone tip)","Chin muscle"],sev:1,desc:"A hard hit to the chin transmits force into the jaw joint and skull, causing a knockout or concussion.",reg:"head",g:"Head"},
+  {id:"nose",label:"Nose",x:147,y:45,r:8,anat:["Nasal bone (thin)","Nose cartilage (flexible part)","Sinuses","Blood vessels (rich supply)"],sev:1,desc:"The nasal bone breaks easily — one of the most common facial fractures. Bleeds heavily due to rich blood supply.",reg:"head",g:"Head",fo:true},
+  {id:"mouth",label:"Mouth / Jaw",x:146,y:55,r:8,anat:["Jawbone","Teeth","Tongue","Oral blood vessels"],sev:1,desc:"The jaw can fracture or dislocate. Teeth can be knocked out or shattered.",reg:"head",g:"Head",fo:true},
+  {id:"chin",label:"Chin",x:146,y:64,r:7,anat:["Mandible (jawbone tip)","Chin muscle"],sev:1,desc:"A hard hit to the chin transmits force into the jaw joint and skull, causing a knockout or concussion.",reg:"head",g:"Head",fo:true},
+  {id:"back_of_head",label:"Back of Head",x:148,y:30,r:18,anat:["Occipital bone (back of skull)","Brain (occipital lobe — vision)","Brainstem (deep)"],sev:3,desc:"The occipital bone is thick but a hard blow here can cause concussion, vision problems, or brainstem damage. Falls often land here.",reg:"head",g:"Head",bo:true},
   {id:"l_neck",label:"Patient's Left Neck",x:158,y:78,r:7,anat:["Left carotid artery","Left jugular vein","Neck vertebrae (spine)"],sev:4,desc:"Carotid carries blood to the brain — severing it means death in minutes.",reg:"neck",g:"Neck"},
   {id:"r_neck",label:"Patient's Right Neck",x:133,y:78,r:7,anat:["Right carotid artery","Right jugular vein","Neck vertebrae (spine)"],sev:4,desc:"Carotid and jugular critically exposed. Spinal damage at this level can mean paralysis or death.",reg:"neck",g:"Neck"},
   {id:"throat",label:"Throat",x:145,y:82,r:6,anat:["Windpipe","Food pipe","Thyroid"],sev:3,desc:"Windpipe sits right at the surface with almost no protection.",reg:"neck",g:"Neck"},
@@ -307,7 +308,7 @@ function getConseq(zid, sev) {
     if (zid === "throat" && sev >= 2) c.push("Swallowing food, water, or medicine hurts");
   }
   // HEAD
-  if (["crown","forehead","l_temple","r_temple","concussion"].indexOf(zid) >= 0) {
+  if (["crown","forehead","l_temple","r_temple","back_of_head","concussion"].indexOf(zid) >= 0) {
     if (sev >= 1) c.push("Headaches — worse with bright light, loud noise, or sudden movement");
     if (sev >= 2) c.push("Dizzy spells — quick movements make the world spin");
     if (sev >= 2) c.push("Can't wear a hat comfortably — pressure on the wound");
@@ -451,7 +452,7 @@ var getComaType = function(injuries) {
   var types = injuries.map(function(i){return i.type;});
   // Head injury coma
   if(types.some(function(t){return t==="concussion"||t==="skull_pressure";})) return COMA_DATA.head;
-  if(injuries.some(function(i){var tp=i.type;return i.zid&&(i.zid.indexOf("temple")>=0||i.zid==="crown"||i.zid==="forehead")&&(tp.indexOf("gsw")>=0||tp==="stab_wound"||tp==="blast_shrapnel"||tp==="crush_injury");})) return COMA_DATA.head;
+  if(injuries.some(function(i){var tp=i.type;return i.zid&&(i.zid.indexOf("temple")>=0||i.zid==="crown"||i.zid==="forehead"||i.zid==="back_of_head")&&(tp.indexOf("gsw")>=0||tp==="stab_wound"||tp==="blast_shrapnel"||tp==="crush_injury");})) return COMA_DATA.head;
   // Crush coma
   if(types.indexOf("crush_injury")>=0) return COMA_DATA.crush;
   // Poison/overdose coma
@@ -467,11 +468,11 @@ var getComaType = function(injuries) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // LETHALITY WARNING — flags injury patterns that would realistically be fatal
 // ═══════════════════════════════════════════════════════════════════════════════
-var LETHAL_ZONES = ["l_temple","r_temple","forehead","crown","throat","l_neck","r_neck","heart"];
+var LETHAL_ZONES = ["l_temple","r_temple","forehead","crown","back_of_head","throat","l_neck","r_neck","heart"];
 var HIGH_LETHAL_ZONES = ["l_temple","r_temple","throat","heart"];
 var getLethalityWarning = function(zid, type, weaponId, sv) {
   if(!zid||!type) return null;
-  var isHead = ["l_temple","r_temple","forehead","crown","l_eye","r_eye"].indexOf(zid)>=0;
+  var isHead = ["l_temple","r_temple","forehead","crown","back_of_head","l_eye","r_eye"].indexOf(zid)>=0;
   var isThroat = zid==="throat"||zid==="l_neck"||zid==="r_neck";
   var isHeart = zid==="heart"||zid==="sternum";
   var wCat = weaponId?(weaponId.indexOf(":")>=0?weaponId.split(":")[0]:weaponId):"";
@@ -572,7 +573,7 @@ function getCombined(injuries, zones) {
   // Injury types that count as REAL chest impairment (breathing/cardio)
   var REAL_CHEST_IMPAIR = ["gsw_lodged","gsw_tt","gsw_graze","stab_wound","rib_fracture","deflated_lung","organ_damage","blast_shrapnel","crush_injury","arterial_bleed","drowning","burn_2","burn_3"];
   // Head zones that involve the brain/skull (not just face)
-  var BRAIN_ZONES = ["crown","forehead","l_temple","r_temple"];
+  var BRAIN_ZONES = ["crown","forehead","l_temple","r_temple","back_of_head"];
 
   injuries.forEach(function(inj) {
     var z = zones.find(function(zn) { return zn.id === inj.zid; });
@@ -674,8 +675,8 @@ function gzi(zone) {
     if(t==="ear_injury"&&!zone.id.includes("ear")) return false;
     if(t==="jaw_fracture"&&!["mouth","chin"].includes(zone.id)) return false;
     if(t==="tooth_damage"&&zone.id!=="mouth") return false;
-    if(t==="concussion"&&!["forehead","l_temple","r_temple","crown","chin"].includes(zone.id)) return false;
-    if(t==="skull_pressure"&&!["l_temple","r_temple","forehead","crown"].includes(zone.id)) return false;
+    if(t==="concussion"&&!["forehead","l_temple","r_temple","crown","chin","back_of_head"].includes(zone.id)) return false;
+    if(t==="skull_pressure"&&!["l_temple","r_temple","forehead","crown","back_of_head"].includes(zone.id)) return false;
     if(t==="deflated_lung"&&!zone.anat.some(a=>/lung/i.test(a))) return false;
     if(t==="organ_damage"&&!zone.anat.some(a=>/heart|lung|liver|spleen|kidney|stomach|intestine|bladder|gallbladder|pancreas|appendix/i.test(a))) return false;
     if(t==="rib_fracture"&&!zone.anat.some(a=>/rib/i.test(a))) return false;
@@ -860,7 +861,7 @@ const JOURNAL = [
 // ═══════════════════════════════════════════════════════════════════════════════
 function Body({back,markers,act,onClick}){
   var ref=useRef(null);
-  var vis=Z.filter(function(z){return back?(z.bo||!["chest","abdomen"].includes(z.reg)):!z.bo;});
+  var vis=Z.filter(function(z){return back?(z.bo||(!["chest","abdomen"].includes(z.reg)&&!z.fo)):!z.bo;});
   var hnd=function(e){var svg=ref.current;if(!svg)return;var pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var sp=pt.matrixTransform(svg.getScreenCTM().inverse());var b=null,bd=99;vis.forEach(function(z){var d=Math.hypot(sp.x-z.x,sp.y-z.y);if(d<z.r+18&&d<bd){b=z;bd=d;}});if(b)onClick(b,sp.x,sp.y);};
   return(
     <svg ref={ref} viewBox="0 0 300 510" onClick={hnd} className="cg-body-svg">
