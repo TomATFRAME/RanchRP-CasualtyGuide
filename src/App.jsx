@@ -1145,7 +1145,7 @@ export default function App(){
   const sug=cSev(val);
   const eff=oSv||sug;
 
-  const bClick=useCallback((zone,cx,cy)=>{setInjs(p=>{if(p.length<3){const n=[...p,{zid:zone.id,type:"",weapon:"",intDmg:"",intSev:0,cx,cy}];setAct(n.length-1);return n;}return p.map((x,i)=>i===act?{zid:zone.id,type:"",weapon:"",intDmg:"",intSev:0,cx,cy}:x);});},[act]);
+  const bClick=useCallback((zone,cx,cy)=>{setInjs(p=>{if(p.length<3){const n=[...p,{zid:zone.id,type:"",weapon:"",intDmg:"",intSev:0,cause:null,cx,cy}];setAct(n.length-1);return n;}return p.map((x,i)=>i===act?{zid:zone.id,type:"",weapon:"",intDmg:"",intSev:0,cause:null,cx,cy}:x);});},[act]);
 
   const sel={width:"100%",padding:"7px 9px",borderRadius:6,border:"1px solid "+T.border,background:T.inputBg,fontFamily:"Georgia,serif",fontSize:12.5,color:T.text,appearance:"auto"};
   const has=val.length>0||ill;
@@ -1179,8 +1179,9 @@ export default function App(){
         <div className="cg-injuries">
             {!injs.length&&<div style={{textAlign:"center",padding:"24px 12px",color:T.textMuted}}><p style={{fontSize:24,margin:"0 0 5px"}}>👆</p><P style={{fontStyle:"italic",color:T.textMuted}}>Click anywhere on the body to place an injury.</P><P style={{fontSize:10,color:T.textFaint}}>Up to 3.</P></div>}
             {injs.map((inj,i)=>{const zone=Z.find(z=>z.id===inj.zid);const avail=zone?gzi(zone):[];const isA=act===i;
-              // Filter available types by cause category
-              const causeTypes=cause&&cause.types?avail.filter(t=>cause.types.includes(t)):avail;
+              // Filter available types by this injury's cause category
+              const injCause=inj.cause?CAUSES.find(c=>c.id===inj.cause):null;
+              const causeTypes=injCause&&injCause.types?avail.filter(t=>injCause.types.includes(t)):avail;
               return(<div key={i} onClick={()=>setAct(i)} style={{background:isA?T.activeBg:T.sectionBg,border:"2px solid "+(isA?T.activeBorder:T.borderLight),borderRadius:9,padding:"9px 10px",cursor:"pointer",transition:"all .15s"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
                   <span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:"bold",fontSize:12.5,color:T.text}}><span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:17,height:17,borderRadius:"50%",background:"#b22222",color:"#fff",fontSize:9.5,fontWeight:"bold",marginRight:4}}>{i+1}</span>{zone&&zone.label||"—"}</span>
@@ -1190,7 +1191,7 @@ export default function App(){
                 {/* Cause category selector */}
                 {zone&&!inj.type&&<div style={{marginBottom:5}}>
                   <P style={{fontSize:10,fontWeight:"bold",color:T.textMuted,marginBottom:3}}>What happened?</P>
-                  <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{CAUSES.map(c=><button key={c.id} onClick={e=>{e.stopPropagation();setCause(cause&&cause.id===c.id?null:c);}} style={{padding:"4px 8px",borderRadius:6,border:"1px solid "+(cause&&cause.id===c.id?T.accent:T.borderLight),background:cause&&cause.id===c.id?T.activeBg:"transparent",color:cause&&cause.id===c.id?T.accent:T.textMuted,fontSize:10,fontWeight:"bold",cursor:"pointer",fontFamily:"Georgia,serif",transition:"all .15s"}}>{c.label}</button>)}</div>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{CAUSES.map(c=><button key={c.id} onClick={e=>{e.stopPropagation();setInjs(p=>p.map((x,j)=>j===i?{...x,cause:x.cause===c.id?null:c.id,type:"",weapon:"",intDmg:"",intSev:0}:x));}} style={{padding:"4px 8px",borderRadius:6,border:"1px solid "+(inj.cause===c.id?T.accent:T.borderLight),background:inj.cause===c.id?T.activeBg:"transparent",color:inj.cause===c.id?T.accent:T.textMuted,fontSize:10,fontWeight:"bold",cursor:"pointer",fontFamily:"Georgia,serif",transition:"all .15s"}}>{c.label}</button>)}</div>
                 </div>}
                 {zone&&<select value={inj.type||""} onChange={e=>{setInjs(p=>p.map((x,j)=>j===i?{...x,type:e.target.value,weapon:"",intDmg:"",intSev:0}:x));}} onClick={e=>e.stopPropagation()} style={sel}><option value="">— Pick the injury —</option>{causeTypes.map(k=><option key={k} value={k}>{IT[k]&&IT[k].i} {IT[k]&&IT[k].l}</option>)}</select>}
                 {inj.type&&needsWeapon(inj.type)&&(
