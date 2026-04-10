@@ -873,7 +873,9 @@ const JOURNAL = [
 function Body({back,markers,act,onClick}){
   var ref=useRef(null);
   var vis=Z.filter(function(z){return back?(z.bo||(!["chest","abdomen"].includes(z.reg)&&!z.fo)):!z.bo;});
-  var hnd=function(e){var svg=ref.current;if(!svg)return;var pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var sp=pt.matrixTransform(svg.getScreenCTM().inverse());var b=null,bd=99;vis.forEach(function(z){var d=Math.hypot(sp.x-z.x,sp.y-z.y);if(d<z.r+18&&d<bd){b=z;bd=d;}});if(b)onClick(b,sp.x,sp.y);};
+  // Mirror x for non-back-only zones when viewing back (arms, legs, head flip sides)
+  var mx=function(z){return (back&&!z.bo)?(290-z.x):z.x;};
+  var hnd=function(e){var svg=ref.current;if(!svg)return;var pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var sp=pt.matrixTransform(svg.getScreenCTM().inverse());var b=null,bd=99;vis.forEach(function(z){var zx=mx(z);var d=Math.hypot(sp.x-zx,sp.y-z.y);if(d<z.r+18&&d<bd){b=z;bd=d;}});if(b)onClick(b,sp.x,sp.y);};
   return(
     <svg ref={ref} viewBox="0 0 300 510" onClick={hnd} className="cg-body-svg">
       <defs>
@@ -888,8 +890,8 @@ function Body({back,markers,act,onClick}){
       </g>
       {back && <text x="150" y="8" textAnchor="middle" fontSize="9" fill="#bbb" fontFamily="Georgia,serif" fontWeight="bold">BACK</text>}
       {!back && <text x="150" y="8" textAnchor="middle" fontSize="9" fill="#bbb" fontFamily="Georgia,serif" fontWeight="bold">FRONT</text>}
-      {vis.map(function(z){return React.createElement("circle",{key:z.id,cx:z.x,cy:z.y,r:z.r,fill:"transparent",stroke:"none"});})}
-      {markers.map(function(m,i){var z=Z.find(function(zn){return zn.id===m.zid;});if(!z)return null;var cx=m.cx||z.x,cy=m.cy||z.y;return React.createElement("g",{key:i},React.createElement("circle",{cx:cx,cy:cy,r:18,fill:"url(#hg)"},React.createElement("animate",{attributeName:"r",values:"16;22;16",dur:"2s",repeatCount:"indefinite"})),React.createElement("circle",{cx:cx,cy:cy,r:9,fill:i===act?"#cd853f":"#b22222",stroke:"#fff",strokeWidth:"2",filter:"url(#gl)"}),React.createElement("text",{x:cx,y:cy+3.5,textAnchor:"middle",fontSize:"10",fontWeight:"bold",fill:"#fff",fontFamily:"Georgia"},i+1));})}
+      {vis.map(function(z){return React.createElement("circle",{key:z.id,cx:mx(z),cy:z.y,r:z.r,fill:"transparent",stroke:"none"});})}
+      {markers.map(function(m,i){var z=Z.find(function(zn){return zn.id===m.zid;});if(!z)return null;var cx=mx(z),cy=z.y;return React.createElement("g",{key:i},React.createElement("circle",{cx:cx,cy:cy,r:18,fill:"url(#hg)"},React.createElement("animate",{attributeName:"r",values:"16;22;16",dur:"2s",repeatCount:"indefinite"})),React.createElement("circle",{cx:cx,cy:cy,r:9,fill:i===act?"#cd853f":"#b22222",stroke:"#fff",strokeWidth:"2",filter:"url(#gl)"}),React.createElement("text",{x:cx,y:cy+3.5,textAnchor:"middle",fontSize:"10",fontWeight:"bold",fill:"#fff",fontFamily:"Georgia"},i+1));})}
       {!markers.length&&<text x={150} y={505} textAnchor="middle" fontSize="10" fill="#8b7355" fontStyle="italic" fontFamily="Georgia">Click anywhere on the body</text>}
     </svg>
   );
