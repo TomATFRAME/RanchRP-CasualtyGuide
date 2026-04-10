@@ -61,7 +61,9 @@ const Z = [
   {id:"r_toes",label:"Patient's Right Toes",x:117,y:500,r:10,anat:["Toe phalanges","Toe tendons","Small nerves"],sev:0,desc:"Big toe loss affects balance and gait.",reg:"rightLeg",g:"Patient's Right Leg"},
   {id:"u_back",label:"Upper Back",x:145,y:120,r:16,anat:["Upper spine","Spinal cord","Shoulder blades","Lungs (behind ribs)"],sev:3,desc:"Spinal cord here — damage means paralysis.",reg:"back",g:"Back",bo:true},
   {id:"m_back",label:"Mid Back",x:145,y:174,r:16,anat:["Upper and lower spine","Spinal cord","Kidneys (flanks)","Rear ribs"],sev:3,desc:"Kidneys on either side — blood-rich, vulnerable from behind.",reg:"back",g:"Back",bo:true},
-  {id:"lo_back",label:"Lower Back",x:145,y:229,r:16,anat:["Lower spine","Spinal nerves","Major back muscles"],sev:2,desc:"Lower spine bears most body weight. Nerve damage affects legs.",reg:"back",g:"Back",bo:true},
+  {id:"lo_back",label:"Lower Back",x:145,y:222,r:14,anat:["Lower spine","Spinal nerves","Major back muscles"],sev:2,desc:"Lower spine bears most body weight. Nerve damage affects legs.",reg:"back",g:"Back",bo:true},
+  {id:"l_buttock",label:"Patient's Left Buttock",x:168,y:275,r:16,anat:["Gluteal muscles (large)","Sciatic nerve (deep)","Pelvic bone"],sev:0,desc:"Thick muscle protects the sciatic nerve and pelvis. Painful but rarely life-threatening. GSWs can hit the sciatic nerve causing leg numbness.",reg:"back",g:"Back",bo:true},
+  {id:"r_buttock",label:"Patient's Right Buttock",x:122,y:275,r:16,anat:["Gluteal muscles (large)","Sciatic nerve (deep)","Pelvic bone"],sev:0,desc:"Heavy muscle mass absorbs impact well. Sciatic nerve damage causes shooting pain and leg weakness.",reg:"back",g:"Back",bo:true},
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -344,6 +346,13 @@ function getConseq(zid, sev) {
     if (sev >= 2) c.push("Can't twist to look behind — whole body has to turn");
     if (sev >= 2) c.push("Carrying anything heavy (saddlebags, bodies, crates) is out");
     if (sev >= 3) c.push("Every movement is slow and deliberate — the back controls everything");
+  }
+  // BUTTOCKS
+  if (zid === "l_buttock" || zid === "r_buttock") {
+    if (sev >= 1) c.push("Sitting is painful — every chair, saddle, and bench is a reminder");
+    if (sev >= 1) c.push("Horse riding is misery — every bounce in the saddle lands right on the wound");
+    if (sev >= 2) c.push("Walking is affected — the glutes power every step, and they're letting you know");
+    if (sev >= 3) c.push("Sciatic nerve hit — shooting pain down the leg, numbness, limping badly");
   }
   return c;
 }
@@ -664,7 +673,7 @@ const RI = {
   rightArm:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation","bruising"],
   leftLeg:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation","bruising"],
   rightLeg:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","snake_bite","arterial_bleed","crush_injury","frostbite","blast_shrapnel","animal_bite","amputation","bruising"],
-  back:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","blast_shrapnel","crush_injury","fracture_hairline","fracture_linear","animal_bite","bruising"],
+  back:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","blast_shrapnel","crush_injury","fracture_hairline","fracture_linear","animal_bite","bruising","concussion"],
 };
 
 function gzi(zone) {
