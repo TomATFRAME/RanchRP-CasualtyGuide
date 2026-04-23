@@ -82,6 +82,7 @@ const IT = {
   blast_shrapnel:{l:"Blast / Shrapnel (Dynamite)",i:"💥",bs:3},
   amputation:{l:"Amputation (Limb/Digit Loss)",i:"✂️",bs:5},
   animal_bite:{l:"Animal Bite / Mauling",i:"🐺",bs:2},
+  scalping:{l:"Scalping",i:"🪒",bs:5},
   bruising:{l:"Bruising (Contusion)",i:"💜",bs:0},
   black_eye:{l:"Black Eye / Swollen Eye",i:"🟣",bs:0},
   split_lip:{l:"Split Lip / Busted Mouth",i:"👄",bs:0},
@@ -173,6 +174,7 @@ const VALID_WEAPONS = {
   deflated_lung: ["handgun","sawnoff","repeater","shotgun","rifle","knife","bow","hammer","horse","environment"],
   animal_bite: ["horse"],
   amputation: ["sawnoff","shotgun","rifle","handgun","hammer","horse","environment","knife"],
+  scalping: ["knife"],
 };
 const validWeapons = (type) => {
   if (!type || !VALID_WEAPONS[type]) return WEAPONS;
@@ -481,6 +483,7 @@ var LETHAL_ZONES = ["l_temple","r_temple","forehead","crown","back_of_head","thr
 var HIGH_LETHAL_ZONES = ["l_temple","r_temple","throat","heart"];
 var getLethalityWarning = function(zid, type, weaponId, sv) {
   if(!zid||!type) return null;
+  if(type==="scalping") return {level:"dire",msg:"Scalping is an extremely severe injury. Survival requires a certified general surgeon — this is beyond field medicine. Without expert intervention, infection of the exposed skull bone is fatal."};
   var isHead = ["l_temple","r_temple","forehead","crown","back_of_head","l_eye","r_eye"].indexOf(zid)>=0;
   var isThroat = zid==="throat"||zid==="l_neck"||zid==="r_neck";
   var isHeart = zid==="heart"||zid==="sternum";
@@ -515,7 +518,7 @@ var getIntDmg = function(id) { return INT_DMG.find(function(d){return d.id===id;
 // Face zones where a visible permanent scar would realistically result
 var FACE_ZONES = ["crown","forehead","l_temple","r_temple","l_eye","r_eye","nose","mouth","chin"];
 // Injury types that commonly leave permanent facial scarring at sufficient severity
-var SCARRING_TYPES = ["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","blast_shrapnel","animal_bite","broken_nose","jaw_fracture","crush_injury","split_lip"];
+var SCARRING_TYPES = ["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","blast_shrapnel","animal_bite","broken_nose","jaw_fracture","crush_injury","split_lip","scalping"];
 var getScarRec = function(zid, type, sv) {
   if (FACE_ZONES.indexOf(zid) < 0) return null;
   if (SCARRING_TYPES.indexOf(type) < 0) return null;
@@ -667,7 +670,7 @@ function getCombined(injuries, zones) {
 }
 
 const RI = {
-  head:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","concussion","broken_nose","skull_pressure","eye_injury","ear_injury","jaw_fracture","tooth_damage","frostbite","blast_shrapnel","crush_injury","animal_bite","strangulation","bruising","black_eye","split_lip","bloody_nose","drowning"],
+  head:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","concussion","broken_nose","skull_pressure","eye_injury","ear_injury","jaw_fracture","tooth_damage","frostbite","blast_shrapnel","crush_injury","animal_bite","strangulation","bruising","black_eye","split_lip","bloody_nose","drowning","scalping"],
   neck:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","arterial_bleed","strangulation","blast_shrapnel","animal_bite","burn_1","burn_2","bruising"],
   chest:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","rib_fracture","deflated_lung","organ_damage","blast_shrapnel","arterial_bleed","crush_injury","animal_bite","bruising","drowning"],
   abdomen:["open_wound","gsw_lodged","gsw_tt","gsw_graze","stab_wound","burn_1","burn_2","burn_3","organ_damage","blast_shrapnel","arterial_bleed","crush_injury","animal_bite","bruising"],
@@ -702,6 +705,7 @@ function gzi(zone) {
     if(t==="split_lip"&&zone.id!=="mouth") return false;
     if(t==="bloody_nose"&&zone.id!=="nose") return false;
     if(t==="drowning"&&!["head","chest"].includes(zone.reg)) return false;
+    if(t==="scalping"&&!["crown","forehead","back_of_head"].includes(zone.id)) return false;
     return true;
   });
 }
@@ -814,6 +818,11 @@ const OD = {
     doEx:{1:["/do Tooth marks punched into their {z}. Bruised around each puncture. Bleeding steady but not gushing."],2:["/do Deep bite on {z}. Skin torn where the teeth ripped free. Bleeding heavy, edges ragged. Already swelling."],3:["/do Chunk of flesh torn from {z}. Muscle visible through the gap. Tooth marks deep around it. Blood flowing freely."],4:["/do Mauled — multiple bites across {z}. Skin hanging in flaps. Muscle exposed. Blood everywhere. Shaking, going grey."],5:["/do {z} is savaged. Flesh torn away in strips. Bone visible through the ruin. Blood pumping from torn vessels. Not moving. Barely breathing."]},
     rec:["Infection is the biggest danger — clean aggressively","Bite wounds need to stay OPEN to drain — don't stitch them shut","Watch for fever, spreading redness, foul smell in the days after","If wild animal: rabies is a concern — get treatment early or it's fatal","Scarring is permanent — teeth leave distinctive marks"],
     drugs:["Whiskey to clean the wound (burns, but kills bacteria)","Laudanum for pain if the bite is deep","Carbolic acid wash to prevent infection"]},
+  scalping:{sym:{1:["Partial scalp torn — flap of skin and hair pulled back, heavy bleeding"],2:["Large section of scalp peeled away — skull bone visible underneath"],3:["Most of the scalp removed — exposed skull, massive blood loss, shock"],4:["Complete scalp removal — bare skull, patient barely conscious, catastrophic bleeding"],5:["Scalped and left for dead — skull exposed, dried blood, infection already starting, near death"]},
+    signs:["🪒 Scalp: Partially or fully peeled away from the skull — may be hanging by a flap","🩸 Bleeding: EXTREME — the scalp is one of the most vascular areas of the body","🦴 Skull: White bone visible underneath where the scalp is gone","😰 Shock: Rapid onset from blood loss and trauma","🧠 Brain: Skull protects the brain but exposed bone risks infection reaching it","🌡️ Infection: Exposed skull bone dries out and dies without tissue covering — osteomyelitis","⚠️ REQUIRES CERTIFIED GENERAL SURGEON — this is beyond field medicine"],
+    doEx:{1:["/do A flap of scalp torn back from {z}, hanging by skin. Hair matted with blood. Skull glimpsed underneath. Blood pouring down the face. Screaming."],2:["/do A large section of scalp peeled away from {z}. White bone exposed. Blood sheeting down, soaking everything. Shaking violently. Eyes wide with terror."],3:["/do Most of the scalp ripped from {z}. Bare skull exposed across the top of the head. Blood everywhere — pooling, dripping, soaking. Barely conscious. Skin going grey."],4:["/do Scalped. The entire top of the head is bare bone — white skull staring up. Scalp gone. Blood loss is catastrophic. No sound coming from them anymore. Eyes glazed."],5:["/do Found scalped. Skull exposed and drying in the air. Caked blood everywhere. Flies already gathering. Barely breathing — if breathing at all. Been here a while."]},
+    rec:["⚠️ REQUIRES A CERTIFIED GENERAL SURGEON — do not attempt field treatment beyond stabilization","Scalp bleeds massively — direct pressure with the cleanest cloth available","If the scalp flap is still attached, hold it in place — a surgeon may reattach it","If the scalp is gone, keep the exposed skull moist — dry bone dies and crumbles","Cover exposed skull with petroleum jelly and clean cloth to prevent drying","The patient WILL go into shock — keep warm, legs elevated, talk to them","Infection is the long-term killer — exposed skull leads to bone death without surgical coverage","Recovery is months. Skin grafting, constant wound care, permanent disfigurement","This is a defining character moment — survival itself is remarkable","Permanent scarring — no hair will regrow on grafted areas"],
+    drugs:["Ether — MUST be unconscious for any surgical work on this","Morphine — severe pain, extended use required, addiction is almost certain","Laudanum for ongoing pain management during the weeks of recovery","Cocaine paste on wound edges if attempting to stitch remaining scalp"]},
   bruising:{sym:{1:["Light bruise, tender to touch, slight discoloration"],2:["Visible purple-blue bruise, swollen, painful when pressed"],3:["Deep bruise, dark purple/black, significant swelling, movement painful"],4:["Massive deep tissue bruising, possible hematoma, area hot and rigid"],5:["Catastrophic bruising — tissue damage beneath, suspected internal bleeding"]},
     signs:["💜 Color: Red→purple→blue→black = deeper/older damage","🫸 Swelling: Bigger = more blood pooled beneath skin","🌡️ Heat: Hot to touch = active bleeding underneath","📐 Size: Spreading bruise = continued bleeding below the surface","⚡ Hardness: Firm lump under bruise = hematoma (blood clot forming)"],
     doEx:{1:["/do Light bruise forming on {z}. Tender when touched. Slight purple discoloration starting."],2:["/do Purple-blue bruise spreading across {z}. Swollen and sore. Winces when the area is pressed."],3:["/do Deep, dark bruise across {z}. Swelling is significant. Skin taut over the area. Pain with any movement."],4:["/do Massive bruising on {z} — nearly black. Area swollen hard, hot to touch. Hematoma forming underneath. Can barely tolerate being touched."],5:["/do {z} is a mottled mess of black and purple. Swelling is enormous, skin stretched tight and shiny. Tissue damage goes deep — something may be bleeding underneath. Weak, dizzy, going grey."]},
@@ -1123,7 +1132,7 @@ function QuickRefTab(){
 // ═══════════════════════════════════════════════════════════════════════════════
 const CAUSES = [
   {id:"gunfight",label:"🔫 Gunfight",desc:"Shot by a firearm",types:["gsw_lodged","gsw_tt","gsw_graze","arterial_bleed","blast_shrapnel"]},
-  {id:"melee",label:"🗡️ Melee & Blades",desc:"Stabbed, slashed, or cut",types:["stab_wound","open_wound","arterial_bleed","amputation"]},
+  {id:"melee",label:"🗡️ Melee & Blades",desc:"Stabbed, slashed, or cut",types:["stab_wound","open_wound","arterial_bleed","amputation","scalping"]},
   {id:"brawl",label:"👊 Brawl",desc:"Punched, kicked, beaten",types:["bruising","black_eye","split_lip","bloody_nose","broken_nose","concussion","open_wound","crush_injury","dislocation","jaw_fracture","tooth_damage","ear_injury","eye_injury","rib_fracture","strangulation"]},
   {id:"animal",label:"🐴 Animal & Horse",desc:"Kicked, thrown, trampled, bitten",types:["bruising","concussion","broken_nose","crush_injury","open_wound","fracture_hairline","fracture_linear","fracture_comminuted","dislocation","rib_fracture","snake_bite","organ_damage","amputation","animal_bite"]},
   {id:"environment",label:"🌿 Environment",desc:"Burns, falls, crashes, drowning",types:["bruising","concussion","broken_nose","drowning","burn_1","burn_2","burn_3","frostbite","blast_shrapnel","fracture_hairline","fracture_linear","fracture_comminuted","crush_injury","dislocation","open_wound","organ_damage"]},
